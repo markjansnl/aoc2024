@@ -1,4 +1,4 @@
-use std::iter::zip;
+use std::{collections::HashMap, iter::zip};
 
 use nom::{
     character::complete::{newline, space1, u32},
@@ -25,9 +25,17 @@ impl Day {
 
     #[inline]
     fn part2((left, right): Parsed) -> Result<Output> {
+        let len = right.len();
+        let counts = right
+            .into_iter()
+            .fold(HashMap::with_capacity(len), |mut counts, r| {
+                counts.entry(r).and_modify(|c| *c = *c + 1).or_insert(1u32);
+                counts
+            });
+
         Ok(left
-            .iter()
-            .map(|l| right.iter().filter(|&r| r == l).count() as Output * l)
+            .into_iter()
+            .map(|l| l * counts.get(&l).unwrap_or(&0))
             .sum())
     }
 }
