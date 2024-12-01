@@ -1,4 +1,5 @@
-use std::{collections::HashMap, iter::zip};
+use std::cmp::Ordering::*;
+use std::iter::zip;
 
 use nom::{
     character::complete::{newline, space1, u32},
@@ -16,34 +17,50 @@ day! {
 
 impl Day {
     #[inline]
-    fn part1((mut left, mut right): Parsed) -> Result<Output> {
-        left.sort_unstable();
-        right.sort_unstable();
-
+    fn part1((left, right): Parsed) -> Result<Output> {
         Ok(zip(left, right).map(|(l, r)| l.abs_diff(r)).sum())
     }
 
     #[inline]
     fn part2((left, right): Parsed) -> Result<Output> {
-        let len = right.len();
-        let counts = right
-            .into_iter()
-            .fold(HashMap::with_capacity(len), |mut counts, r| {
-                counts.entry(r).and_modify(|c| *c = *c + 1).or_insert(1u32);
-                counts
-            });
+        let mut left_iter = left.into_iter().peekable();
+        let mut right_iter = right.into_iter().peekable();
+        let mut sum = 0;
 
-        Ok(left
-            .into_iter()
-            .map(|l| l * counts.get(&l).unwrap_or(&0))
-            .sum())
+        while let (Some(&l), Some(&r)) = (left_iter.peek(), right_iter.peek()) {
+            match l.cmp(&r) {
+                Less => {
+                    left_iter.next();
+                }
+                Greater => {
+                    right_iter.next();
+                }
+                Equal => {
+                    let mut count_l = 0;
+                    let mut count_r = 0;
+                    while left_iter.next_if_eq(&l).is_some() {
+                        count_l += 1;
+                    }
+                    while right_iter.next_if_eq(&r).is_some() {
+                        count_r += 1;
+                    }
+                    sum += l * count_l * count_r;
+                }
+            }
+        }
+
+        Ok(sum)
     }
 }
 
 impl Parser {
     #[inline]
     fn parse(input: &'static str) -> Result<Parsed> {
-        Ok(all_consuming(Self::pairs)(input)?.1.into_iter().unzip())
+        let pairs = all_consuming(Self::pairs)(input)?.1;
+        let (mut left, mut right): (Vec<_>, Vec<_>) = pairs.into_iter().unzip();
+        left.sort_unstable();
+        right.sort_unstable();
+        Ok((left, right))
     }
 
     #[inline]
