@@ -1,54 +1,49 @@
+use std::iter::zip;
+
 use nom::{
     character::complete::{newline, space1, u32},
-    combinator::{all_consuming, opt},
-    multi::fold_many1,
-    sequence::{pair, separated_pair},
+    combinator::all_consuming,
+    multi::separated_list1,
+    sequence::separated_pair,
 };
 
 use crate::*;
 
 day! {
-    Parsed = (Vec<u32>, Vec<u32>),
     Output = u32,
+    Parsed = (Vec<Output>, Vec<Output>),
 }
 
 impl Day {
+    #[inline]
     fn part1((mut left, mut right): Parsed) -> Result<Output> {
-        left.sort();
-        right.sort();
+        left.sort_unstable();
+        right.sort_unstable();
 
-        Ok(left
-            .into_iter()
-            .zip(right)
-            .map(|(l, r)| l.abs_diff(r))
-            .sum())
+        Ok(zip(left, right).map(|(l, r)| l.abs_diff(r)).sum())
     }
 
+    #[inline]
     fn part2((left, right): Parsed) -> Result<Output> {
         Ok(left
-            .into_iter()
-            .map(|l| right.iter().filter(|r| **r == l).count() as Output * l)
+            .iter()
+            .map(|l| right.iter().filter(|&r| r == l).count() as Output * l)
             .sum())
     }
 }
 
 impl Parser {
+    #[inline]
     fn parse(input: &'static str) -> Result<Parsed> {
-        Ok(all_consuming(Self::pairs)(input)?.1)
+        Ok(all_consuming(Self::pairs)(input)?.1.into_iter().unzip())
     }
 
-    fn pairs(s: &'static str) -> IResult<Parsed> {
-        fold_many1(
-            pair(Self::pair, opt(newline)),
-            || (Vec::new(), Vec::new()),
-            |(mut left, mut right), ((l, r), _)| {
-                left.push(l);
-                right.push(r);
-                (left, right)
-            },
-        )(s)
+    #[inline]
+    fn pairs(s: &'static str) -> IResult<Vec<(Output, Output)>> {
+        separated_list1(newline, Self::pair)(s)
     }
 
+    #[inline]
     fn pair(s: &'static str) -> IResult<(Output, Output)> {
         separated_pair(u32, space1, u32)(s)
     }

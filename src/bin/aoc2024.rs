@@ -67,7 +67,7 @@ fn download(days: &BTreeSet<u8>) -> Result<()> {
     let mut iter = days.iter().peekable();
     while let Some(day) = iter.next() {
         println!("Downloading day {day}...");
-        
+
         let mut input = client
             .get(format!("https://adventofcode.com/2024/day/{day}/input"))
             .header("Cookie", format!("session={session}"))
@@ -75,7 +75,7 @@ fn download(days: &BTreeSet<u8>) -> Result<()> {
             .text()?;
 
         input.truncate(input.len() - 1);
-        
+
         fs::write(format!("src/days/day{day:02}/input.txt"), input)?;
 
         if iter.peek().is_some() {

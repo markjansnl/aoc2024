@@ -10,13 +10,12 @@ pub fn criterion_benchmark(criterion: &mut Criterion) {
         if let Some(sample_size) = bench_sample_size(day) {
             group.sample_size(sample_size);
         }
-    
+
         group.bench_function("Part 1", |b| b.iter(|| run(day, Part1)));
 
         group.bench_function("Part 2", |b| b.iter(|| run(day, Part2)));
-    
+
         group.finish();
-    
     }
 }
 

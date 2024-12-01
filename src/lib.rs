@@ -9,6 +9,7 @@ pub type IResult<'a, T> = nom::IResult<&'a str, T>;
 
 pub const DAYS: u8 = 2;
 
+#[inline]
 pub fn run(day: u8, part: Part) -> String {
     match day {
         1 => days::day01::Day::run(part),
@@ -18,6 +19,7 @@ pub fn run(day: u8, part: Part) -> String {
     .unwrap_or_else(|err| err.to_string())
 }
 
+#[inline]
 pub fn bench_sample_size(day: u8) -> Option<usize> {
     match day {
         1 => days::day01::Day::bench_sample_size(),
@@ -33,6 +35,7 @@ pub enum Part {
 }
 
 impl Debug for Part {
+    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Part1 => write!(f, "Part 1"),
@@ -42,6 +45,7 @@ impl Debug for Part {
 }
 
 impl From<u8> for Part {
+    #[inline]
     fn from(value: u8) -> Self {
         match value {
             1 => Part1,
@@ -61,18 +65,19 @@ pub trait DayRunner {
 
 #[macro_export]
 macro_rules! day {
-    ($parsed:ident = $parsed_ty:ty, $output:ident = $output_ty:ty, $( bench_sample_size: $bench_sample_size:literal , )?) => {
-        type $parsed = $parsed_ty;
-        type $output = $output_ty;
+    ($($typ:ident = $ty:ty),+, $(bench_sample_size: $bench_sample_size:literal,)?) => {
+        $( type $typ = $ty; )+
 
         pub struct Day;
         struct Parser;
 
         impl DayRunner for Day {
+            #[inline]
             fn run(part: Part) -> Result<String> {
                 Self::_run(include_str!("input.txt"), part)
             }
 
+            #[inline]
             fn bench_sample_size() -> Option<usize> {
                 #[allow(unused_mut, unused_assignments)]
                 let mut bench_sample_size = None;
@@ -80,6 +85,7 @@ macro_rules! day {
                 bench_sample_size
             }
 
+            #[inline]
             fn _run(input: &'static str, part: Part) -> Result<String> {
                 let parsed = Parser::parse(input)?;
                 Ok(match part {
@@ -115,5 +121,5 @@ macro_rules! run {
                 Ok(())
             }
         }
-    }
+    };
 }
