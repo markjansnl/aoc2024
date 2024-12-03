@@ -7,13 +7,15 @@ pub use Part::*;
 
 pub type IResult<'a, T> = nom::IResult<&'a str, T>;
 
-pub const DAYS: u8 = 2;
+pub const DAYS: u8 = 4;
 
 #[inline]
 pub fn run(day: u8, part: Part) -> String {
     match day {
         1 => days::day01::Day::run(part),
         2 => days::day02::Day::run(part),
+        3 => days::day03::Day::run(part),
+        4 => days::day04::Day::run(part),
         _ => unreachable!(),
     }
     .unwrap_or_else(|err| err.to_string())
@@ -24,6 +26,8 @@ pub fn bench_sample_size(day: u8) -> Option<usize> {
     match day {
         1 => days::day01::Day::bench_sample_size(),
         2 => days::day02::Day::bench_sample_size(),
+        3 => days::day03::Day::bench_sample_size(),
+        4 => days::day04::Day::bench_sample_size(),
         _ => unreachable!(),
     }
 }
