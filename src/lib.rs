@@ -7,7 +7,7 @@ pub use Part::*;
 
 pub type IResult<'a, T> = nom::IResult<&'a str, T>;
 
-pub const DAYS: u8 = 4;
+pub const DAYS: u8 = 25;
 
 #[inline]
 pub fn run(day: u8, part: Part) -> String {
@@ -16,6 +16,27 @@ pub fn run(day: u8, part: Part) -> String {
         2 => days::day02::Day::run(part),
         3 => days::day03::Day::run(part),
         4 => days::day04::Day::run(part),
+        5 => days::day05::Day::run(part),
+        6 => days::day06::Day::run(part),
+        7 => days::day07::Day::run(part),
+        8 => days::day08::Day::run(part),
+        9 => days::day09::Day::run(part),
+        10 => days::day10::Day::run(part),
+        11 => days::day11::Day::run(part),
+        12 => days::day12::Day::run(part),
+        13 => days::day13::Day::run(part),
+        14 => days::day14::Day::run(part),
+        15 => days::day15::Day::run(part),
+        16 => days::day16::Day::run(part),
+        17 => days::day17::Day::run(part),
+        18 => days::day18::Day::run(part),
+        19 => days::day19::Day::run(part),
+        20 => days::day20::Day::run(part),
+        21 => days::day21::Day::run(part),
+        22 => days::day22::Day::run(part),
+        23 => days::day23::Day::run(part),
+        24 => days::day24::Day::run(part),
+        25 => days::day25::Day::run(part),
         _ => unreachable!(),
     }
     .unwrap_or_else(|err| err.to_string())
@@ -28,6 +49,27 @@ pub fn bench_sample_size(day: u8) -> Option<usize> {
         2 => days::day02::Day::bench_sample_size(),
         3 => days::day03::Day::bench_sample_size(),
         4 => days::day04::Day::bench_sample_size(),
+        5 => days::day05::Day::bench_sample_size(),
+        6 => days::day06::Day::bench_sample_size(),
+        7 => days::day07::Day::bench_sample_size(),
+        8 => days::day08::Day::bench_sample_size(),
+        9 => days::day09::Day::bench_sample_size(),
+        10 => days::day10::Day::bench_sample_size(),
+        11 => days::day11::Day::bench_sample_size(),
+        12 => days::day12::Day::bench_sample_size(),
+        13 => days::day13::Day::bench_sample_size(),
+        14 => days::day14::Day::bench_sample_size(),
+        15 => days::day15::Day::bench_sample_size(),
+        16 => days::day16::Day::bench_sample_size(),
+        17 => days::day17::Day::bench_sample_size(),
+        18 => days::day18::Day::bench_sample_size(),
+        19 => days::day19::Day::bench_sample_size(),
+        20 => days::day20::Day::bench_sample_size(),
+        21 => days::day21::Day::bench_sample_size(),
+        22 => days::day22::Day::bench_sample_size(),
+        23 => days::day23::Day::bench_sample_size(),
+        24 => days::day24::Day::bench_sample_size(),
+        25 => days::day25::Day::bench_sample_size(),
         _ => unreachable!(),
     }
 }
