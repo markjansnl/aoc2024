@@ -69,8 +69,9 @@ pub trait DayRunner {
 
 #[macro_export]
 macro_rules! day {
-    ($($typ:ident = $ty:ty),+, $(bench_sample_size: $bench_sample_size:literal,)?) => {
-        $( type $typ = $ty; )+
+    ($(Output = $output:ty,)? $(Parsed = $parsed:ty,)? $(bench_sample_size: $bench_sample_size:literal,)?) => {
+        $( type Output = $output; )?
+        $( type Parsed = $parsed; )?
 
         pub struct Day;
         struct Parser;
