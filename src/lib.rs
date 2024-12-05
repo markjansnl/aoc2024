@@ -74,7 +74,7 @@ pub fn bench_sample_size(day: u8) -> Option<usize> {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Part {
     Part1,
     Part2,
