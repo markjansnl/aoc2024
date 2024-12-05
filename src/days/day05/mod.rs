@@ -28,21 +28,6 @@ struct OrderingRule {
     after: PageNumber,
 }
 
-struct PageMap {
-    indices: [Option<usize>; 100],
-}
-
-impl From<&Section> for PageMap {
-    #[inline]
-    fn from(section: &Section) -> Self {
-        let mut indices = [None; 100];
-        for (idx, &page) in section.iter().enumerate() {
-            indices[page] = Some(idx);
-        }
-        Self { indices }
-    }
-}
-
 struct OrderingRulesSet {
     ordering_rules_set: [bool; 10_000],
 }
@@ -84,9 +69,12 @@ trait SectionOrdering {
 impl SectionOrdering for Section {
     #[inline]
     fn correctly_ordered(&self, ordering_rules: &[OrderingRule]) -> bool {
-        let page_map = PageMap::from(self);
+        let mut indices = [None; 100];
+        for (idx, &page) in self.iter().enumerate() {
+            indices[page] = Some(idx);
+        }
         ordering_rules.iter().all(|OrderingRule { before, after }| {
-            match (page_map.indices[*before], page_map.indices[*after]) {
+            match (indices[*before], indices[*after]) {
                 (Some(idx_before), Some(idx_after)) => idx_before < idx_after,
                 _ => true,
             }
