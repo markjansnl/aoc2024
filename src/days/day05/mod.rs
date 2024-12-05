@@ -1,4 +1,4 @@
-use std::{cmp::Ordering, collections::HashSet};
+use std::cmp::Ordering;
 
 use nom::{
     bytes::complete::tag,
@@ -23,7 +23,6 @@ struct Input {
     sections: Vec<Section>,
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 struct OrderingRule {
     before: PageNumber,
     after: PageNumber,
@@ -44,6 +43,28 @@ impl From<&Section> for PageMap {
     }
 }
 
+struct OrderingRulesSet {
+    ordering_rules_set: [bool; 10_000],
+}
+
+impl From<&Vec<OrderingRule>> for OrderingRulesSet {
+    #[inline]
+    fn from(ordering_rules: &Vec<OrderingRule>) -> Self {
+        let mut ordering_rules_set = [false; 10_000];
+        for ordering_rule in ordering_rules {
+            ordering_rules_set[ordering_rule.before * 100 + ordering_rule.after] = true;
+        }
+        Self { ordering_rules_set }
+    }
+}
+
+impl OrderingRulesSet {
+    #[inline]
+    fn contains(&self, before: &PageNumber, after: &PageNumber) -> bool {
+        self.ordering_rules_set[before * 100 + after]
+    }
+}
+
 trait MiddlePageNumber {
     fn middle_page_number(&self) -> PageNumber;
 }
@@ -57,7 +78,7 @@ impl MiddlePageNumber for Vec<PageNumber> {
 
 trait SectionOrdering {
     fn correctly_ordered(&self, ordering_rules: &[OrderingRule]) -> bool;
-    fn reorder(&self, ordering_rules: &HashSet<OrderingRule>) -> Self;
+    fn reorder(&self, ordering_rules: &OrderingRulesSet) -> Self;
 }
 
 impl SectionOrdering for Section {
@@ -73,18 +94,12 @@ impl SectionOrdering for Section {
     }
 
     #[inline]
-    fn reorder(&self, ordering_rules_set: &HashSet<OrderingRule>) -> Self {
+    fn reorder(&self, ordering_rules_set: &OrderingRulesSet) -> Self {
         let mut reordered = self.clone();
         reordered.sort_by(|a, b| {
-            if ordering_rules_set.contains(&OrderingRule {
-                before: *a,
-                after: *b,
-            }) {
+            if ordering_rules_set.contains(a, b) {
                 Ordering::Less
-            } else if ordering_rules_set.contains(&OrderingRule {
-                before: *b,
-                after: *a,
-            }) {
+            } else if ordering_rules_set.contains(b, a) {
                 Ordering::Greater
             } else {
                 Ordering::Equal
@@ -107,7 +122,7 @@ impl Day {
 
     #[inline]
     fn part2(input: Parsed) -> Result<Output> {
-        let ordering_rules_set = input.ordering_rules.clone().iter().copied().collect();
+        let ordering_rules_set = OrderingRulesSet::from(&input.ordering_rules);
         Ok(input
             .sections
             .into_iter()
