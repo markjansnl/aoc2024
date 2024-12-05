@@ -1,7 +1,4 @@
-use nom::{
-    character::complete::u32,
-    combinator::all_consuming,
-};
+use nom::{character::complete::u32, combinator::all_consuming};
 
 use crate::*;
 

@@ -32,10 +32,10 @@ impl Puzzle {
                         let mut count = 0;
                         for offset_y in -1..=1isize {
                             for offset_x in -1..=1isize {
-                                if offset_y != 0 || offset_x != 0 {
-                                    if self.check_mas(y as isize, x as isize, offset_y, offset_x) {
-                                        count += 1;
-                                    }
+                                if (offset_y != 0 || offset_x != 0)
+                                    && self.check_mas(y as isize, x as isize, offset_y, offset_x)
+                                {
+                                    count += 1;
                                 }
                             }
                         }
