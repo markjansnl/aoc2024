@@ -55,11 +55,23 @@ impl MiddlePageNumber for Vec<PageNumber> {
     }
 }
 
-trait Reorder {
+trait SectionOrdering {
+    fn correctly_ordered(&self, ordering_rules: &[OrderingRule]) -> bool;
     fn reorder(&self, ordering_rules: &HashSet<OrderingRule>) -> Self;
 }
 
-impl Reorder for Section {
+impl SectionOrdering for Section {
+    #[inline]
+    fn correctly_ordered(&self, ordering_rules: &[OrderingRule]) -> bool {
+        let page_map = PageMap::from(self);
+        ordering_rules.iter().all(|OrderingRule { before, after }| {
+            match (page_map.indices[*before], page_map.indices[*after]) {
+                (Some(idx_before), Some(idx_after)) => idx_before < idx_after,
+                _ => true,
+            }
+        })
+    }
+
     #[inline]
     fn reorder(&self, ordering_rules_set: &HashSet<OrderingRule>) -> Self {
         let mut reordered = self.clone();
@@ -82,47 +94,26 @@ impl Reorder for Section {
     }
 }
 
-impl Input {
-    #[inline]
-    fn sum_middle_page_numbers(&self, part: Part) -> Output {
-        let ordering_rules_set = match part {
-            Part1 => HashSet::new(),
-            Part2 => self.ordering_rules.iter().copied().collect(),
-        };
-
-        self.sections
-            .iter()
-            .filter_map(|section| {
-                let page_map = PageMap::from(section);
-                let correctly_orderd =
-                    self.ordering_rules
-                        .iter()
-                        .all(|OrderingRule { before, after }| {
-                            match (page_map.indices[*before], page_map.indices[*after]) {
-                                (Some(idx_before), Some(idx_after)) => idx_before < idx_after,
-                                _ => true,
-                            }
-                        });
-
-                match part {
-                    Part1 => correctly_orderd.then_some(section.middle_page_number()),
-                    Part2 => (!correctly_orderd)
-                        .then_some(section.reorder(&ordering_rules_set).middle_page_number()),
-                }
-            })
-            .sum()
-    }
-}
-
 impl Day {
     #[inline]
     fn part1(input: Parsed) -> Result<Output> {
-        Ok(input.sum_middle_page_numbers(Part1))
+        Ok(input
+            .sections
+            .into_iter()
+            .filter(|section| section.correctly_ordered(&input.ordering_rules))
+            .map(|section| section.middle_page_number())
+            .sum())
     }
 
     #[inline]
     fn part2(input: Parsed) -> Result<Output> {
-        Ok(input.sum_middle_page_numbers(Part2))
+        let ordering_rules_set = input.ordering_rules.clone().iter().copied().collect();
+        Ok(input
+            .sections
+            .into_iter()
+            .filter(|section| !section.correctly_ordered(&input.ordering_rules))
+            .map(|section| section.reorder(&ordering_rules_set).middle_page_number())
+            .sum())
     }
 }
 
