@@ -1,33 +1,110 @@
-use nom::{character::complete::u32, combinator::all_consuming};
+use nom::{
+    bytes::complete::tag,
+    character::complete::{newline, u64},
+    combinator::{all_consuming, map},
+    multi::separated_list1,
+    sequence::separated_pair,
+};
+use rayon::prelude::*;
 
 use crate::*;
 
 day! {
-    Output = u32,
-    Parsed = u32,
+    Output = Number,
+    Parsed = Calibration,
+    bench_sample_size: 10,
+}
+
+type Number = u64;
+type Calibration = Vec<CalibrationEquation>;
+
+struct CalibrationEquation {
+    test_value: u64,
+    numbers: Vec<u64>,
 }
 
 impl Day {
     #[inline]
-    fn part1(parsed: Parsed) -> Result<Output> {
-        Ok(parsed)
+    fn part1(calibration: Parsed) -> Result<Output> {
+        Ok(calibration
+            .into_iter()
+            .filter(|calibration| {
+                Self::check_part1(
+                    calibration.numbers[0],
+                    &calibration.numbers[1..],
+                    calibration.test_value,
+                )
+            })
+            .map(|calibration| calibration.test_value)
+            .sum())
     }
 
     #[inline]
-    fn part2(_parsed: Parsed) -> Result<Output> {
-        Ok(0)
+    fn part2(calibration: Parsed) -> Result<Output> {
+        Ok(calibration
+            .into_par_iter()
+            .filter(|calibration| {
+                Self::check_part2(
+                    calibration.numbers[0],
+                    &calibration.numbers[1..],
+                    calibration.test_value,
+                )
+            })
+            .map(|calibration| calibration.test_value)
+            .sum())
+    }
+
+    #[inline]
+    fn check_part1(evaluated: Number, numbers: &[Number], test_value: Number) -> bool {
+        if numbers.len() == 0 {
+            evaluated == test_value
+        } else {
+            Self::check_part1(evaluated + numbers[0], &numbers[1..], test_value)
+                || Self::check_part1(evaluated * numbers[0], &numbers[1..], test_value)
+        }
+    }
+
+    #[inline]
+    fn check_part2(evaluated: Number, numbers: &[Number], test_value: Number) -> bool {
+        if numbers.len() == 0 {
+            evaluated == test_value
+        } else {
+            Self::check_part2(evaluated + numbers[0], &numbers[1..], test_value)
+                || Self::check_part2(evaluated * numbers[0], &numbers[1..], test_value)
+                || Self::check_part2(
+                    format!("{}{}", evaluated, numbers[0]).parse().unwrap(),
+                    &numbers[1..],
+                    test_value,
+                )
+        }
     }
 }
 
 impl Parser {
     #[inline]
     fn parse(input: &'static str) -> Result<Parsed> {
-        Ok(all_consuming(Self::integer)(input)?.1)
+        Ok(all_consuming(Self::calibration)(input)?.1)
     }
 
     #[inline]
-    fn integer(s: &'static str) -> IResult<Parsed> {
-        u32(s)
+    fn calibration(s: &'static str) -> IResult<Parsed> {
+        separated_list1(newline, Self::calibration_equation)(s)
+    }
+
+    #[inline]
+    fn calibration_equation(s: &'static str) -> IResult<CalibrationEquation> {
+        map(
+            separated_pair(u64, tag(": "), Self::numbers),
+            |(test_value, numbers)| CalibrationEquation {
+                test_value,
+                numbers,
+            },
+        )(s)
+    }
+
+    #[inline]
+    fn numbers(s: &'static str) -> IResult<Vec<u64>> {
+        separated_list1(tag(" "), u64)(s)
     }
 }
 
@@ -39,7 +116,7 @@ mod tests {
 
     run!(Part2);
 
-    test_example!("example1", Part1, 0);
+    test_example!("example1", Part1, 3749);
 
-    test_example!("example1", Part2, 0);
+    test_example!("example1", Part2, 11387);
 }
