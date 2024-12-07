@@ -12,7 +12,6 @@ use crate::*;
 day! {
     Output = Number,
     Parsed = Calibration,
-    bench_sample_size: 10,
 }
 
 type Number = u64;
@@ -56,7 +55,7 @@ impl Day {
 
     #[inline]
     fn check_part1(evaluated: Number, numbers: &[Number], test_value: Number) -> bool {
-        if numbers.len() == 0 {
+        if numbers.is_empty() {
             evaluated == test_value
         } else if evaluated > test_value {
             false
@@ -68,7 +67,7 @@ impl Day {
 
     #[inline]
     fn check_part2(evaluated: Number, numbers: &[Number], test_value: Number) -> bool {
-        if numbers.len() == 0 {
+        if numbers.is_empty() {
             evaluated == test_value
         } else if evaluated > test_value {
             false
