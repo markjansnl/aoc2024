@@ -58,6 +58,8 @@ impl Day {
     fn check_part1(evaluated: Number, numbers: &[Number], test_value: Number) -> bool {
         if numbers.len() == 0 {
             evaluated == test_value
+        } else if evaluated > test_value {
+            false
         } else {
             Self::check_part1(evaluated + numbers[0], &numbers[1..], test_value)
                 || Self::check_part1(evaluated * numbers[0], &numbers[1..], test_value)
@@ -68,6 +70,8 @@ impl Day {
     fn check_part2(evaluated: Number, numbers: &[Number], test_value: Number) -> bool {
         if numbers.len() == 0 {
             evaluated == test_value
+        } else if evaluated > test_value {
+            false
         } else {
             Self::check_part2(evaluated + numbers[0], &numbers[1..], test_value)
                 || Self::check_part2(evaluated * numbers[0], &numbers[1..], test_value)
