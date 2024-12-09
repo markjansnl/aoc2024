@@ -10,7 +10,7 @@ use crate::*;
 day! {
     Output = usize,
     Parsed = DiskMap,
-    bench_sample_size: 70,
+    bench_sample_size: 90,
 }
 
 #[derive(Debug, Clone)]
