@@ -13,18 +13,16 @@ day! {
     bench_sample_size: 90,
 }
 
-#[derive(Debug, Clone)]
 struct DiskMap {
     contents: Vec<DiskContent>,
 }
 
-#[derive(Debug, Clone, Copy)]
 struct DiskContent {
     length: usize,
     content: DiskBlock,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 enum DiskBlock {
     File { id: usize },
     FreeSpace,
