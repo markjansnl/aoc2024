@@ -1,9 +1,10 @@
-use std::{collections::BTreeSet, fs, thread, time::Duration};
+use std::{collections::BTreeSet, fs, sync::mpsc::channel, thread, time::Duration};
 
 use aoc2024::*;
 
 use chrono::{Datelike, Local};
 use clap::Parser;
+use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -47,13 +48,19 @@ fn main() -> Result<()> {
     if cli.download {
         download(&days)?;
     } else {
-        for day in &days {
-            for part in &parts {
-                println!(
-                    "Day: {day:02}, part {part:?}: {}",
-                    run(*day, Part::from(*part))
-                );
-            }
+        let (sender, receiver) = channel();
+        days.par_iter().for_each_with(sender, move |sender, day| {
+            parts.par_iter().for_each(|part| {
+                sender
+                    .send((*day, *part, run(*day, Part::from(*part))))
+                    .unwrap();
+            });
+        });
+
+        let mut results = receiver.into_iter().collect::<Vec<_>>();
+        results.sort();
+        for (day, part, result) in results {
+            println!("Day: {day:02}, part {part:?}: {result}");
         }
     }
 
