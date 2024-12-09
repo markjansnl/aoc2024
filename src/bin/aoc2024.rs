@@ -49,10 +49,10 @@ fn main() -> Result<()> {
         download(&days)?;
     } else {
         let (sender, receiver) = channel();
-        days.par_iter().for_each_with(sender, move |sender, day| {
-            parts.par_iter().for_each(|part| {
+        days.par_iter().for_each_with(sender, |sender, &day| {
+            parts.par_iter().for_each(|&part| {
                 sender
-                    .send((*day, *part, run(*day, Part::from(*part))))
+                    .send((day, part, run(day, Part::from(part))))
                     .unwrap();
             });
         });
@@ -60,7 +60,7 @@ fn main() -> Result<()> {
         let mut results = receiver.into_iter().collect::<Vec<_>>();
         results.sort();
         for (day, part, result) in results {
-            println!("Day: {day:02}, part {part:?}: {result}");
+            println!("Day: {day:02}, part {part}: {result}");
         }
     }
 
