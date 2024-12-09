@@ -85,14 +85,10 @@ impl Day {
             while idx_free_space < idx_file {
                 if disk_map.contents[idx_free_space].length >= disk_map.contents[idx_file].length {
                     let file = disk_map.contents.remove(idx_file).unwrap();
-                    if idx_file > 0 {
-                        disk_map.contents[idx_file - 1].length += file.length;
-                    }
+                    disk_map.contents[idx_file - 1].length += file.length;
                     if idx_file < disk_map.contents.len() {
-                        if idx_file > 0 {
-                            disk_map.contents[idx_file - 1].length +=
-                                disk_map.contents[idx_file].length;
-                        }
+                        disk_map.contents[idx_file - 1].length +=
+                            disk_map.contents[idx_file].length;
                         disk_map.contents.remove(idx_file);
                     }
                     disk_map.contents[idx_free_space].length -= file.length;
