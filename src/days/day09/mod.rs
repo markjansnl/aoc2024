@@ -1,5 +1,4 @@
 use std::{
-    collections::VecDeque,
     iter::{repeat_n, Flatten, RepeatN},
     ops::{Index, IndexMut},
     slice::SliceIndex,
@@ -80,24 +79,24 @@ impl IntoIterator for DiskContent {
 impl Day {
     #[inline]
     fn part1(disk_map: Parsed) -> Result<Output> {
-        let mut disk_blocks = VecDeque::from_iter(disk_map);
+        let disk_blocks = Vec::from_iter(disk_map);
         let mut checksum = 0;
-        let mut idx = 0;
-        while let Some(disk_block) = disk_blocks.pop_front() {
-            match disk_block {
+        let mut idx_checksum = 0;
+        let mut idx_front = 0;
+        let mut idx_back = disk_blocks.len() - 1;
+        while idx_front <= idx_back {
+            idx_front += 1;
+            match disk_blocks[idx_front - 1] {
                 DiskBlock::File { id } => {
-                    checksum += idx * id;
-                    idx += 1
+                    checksum += idx_checksum * id;
+                    idx_checksum += 1
                 }
                 DiskBlock::FreeSpace => loop {
-                    match disk_blocks.pop_back() {
-                        None => break,
-                        Some(DiskBlock::File { id }) => {
-                            checksum += idx * id;
-                            idx += 1;
-                            break;
-                        }
-                        Some(DiskBlock::FreeSpace) => continue,
+                    idx_back -= 1;
+                    if let DiskBlock::File { id } = disk_blocks[idx_back + 1] {
+                        checksum += idx_checksum * id;
+                        idx_checksum += 1;
+                        break;
                     }
                 },
             }
