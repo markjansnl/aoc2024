@@ -81,9 +81,9 @@ impl Day {
     fn part2(mut disk_map: Parsed) -> Result<Output> {
         let mut idx_file = disk_map.contents.len() - 1;
         while idx_file > 0 {
-            let mut idx_gap = 1;
-            while idx_gap < idx_file {
-                if disk_map.contents[idx_gap].length >= disk_map.contents[idx_file].length {
+            let mut idx_free_space = 1;
+            while idx_free_space < idx_file {
+                if disk_map.contents[idx_free_space].length >= disk_map.contents[idx_file].length {
                     let file = disk_map.contents.remove(idx_file).unwrap();
                     if idx_file > 0 {
                         disk_map.contents[idx_file - 1].length += file.length;
@@ -95,10 +95,10 @@ impl Day {
                         }
                         disk_map.contents.remove(idx_file);
                     }
-                    disk_map.contents[idx_gap].length -= file.length;
-                    disk_map.contents.insert(idx_gap, file);
+                    disk_map.contents[idx_free_space].length -= file.length;
+                    disk_map.contents.insert(idx_free_space, file);
                     disk_map.contents.insert(
-                        idx_gap,
+                        idx_free_space,
                         DiskContent {
                             length: 0,
                             content: DiskBlock::FreeSpace,
@@ -107,7 +107,7 @@ impl Day {
                     idx_file += 2;
                     break;
                 }
-                idx_gap += 2;
+                idx_free_space += 2;
             }
             idx_file -= 2;
         }
