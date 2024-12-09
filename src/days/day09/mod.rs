@@ -1,6 +1,8 @@
 use std::{
     collections::VecDeque,
     iter::{repeat_n, Flatten, RepeatN},
+    ops::{Index, IndexMut},
+    slice::SliceIndex,
 };
 
 use crate::*;
@@ -13,7 +15,7 @@ day! {
 
 #[derive(Debug, Clone)]
 struct DiskMap {
-    contents: VecDeque<DiskContent>,
+    contents: Vec<DiskContent>,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -28,9 +30,38 @@ enum DiskBlock {
     FreeSpace,
 }
 
+impl<Idx> Index<Idx> for DiskMap
+where
+    Idx: SliceIndex<[DiskContent]>,
+{
+    type Output = <Idx as SliceIndex<[DiskContent]>>::Output;
+
+    #[inline]
+    fn index(&self, index: Idx) -> &Self::Output {
+        self.contents.index(index)
+    }
+}
+
+impl<Idx> IndexMut<Idx> for DiskMap
+where
+    Idx: SliceIndex<[DiskContent]>,
+{
+    #[inline]
+    fn index_mut(&mut self, index: Idx) -> &mut Self::Output {
+        self.contents.index_mut(index)
+    }
+}
+
+impl DiskMap {
+    #[inline]
+    fn len(&self) -> usize {
+        self.contents.len()
+    }
+}
+
 impl IntoIterator for DiskMap {
     type Item = DiskBlock;
-    type IntoIter = Flatten<std::collections::vec_deque::IntoIter<DiskContent>>;
+    type IntoIter = Flatten<std::vec::IntoIter<DiskContent>>;
 
     #[inline]
     fn into_iter(self) -> Self::IntoIter {
@@ -79,27 +110,20 @@ impl Day {
 
     #[inline]
     fn part2(mut disk_map: Parsed) -> Result<Output> {
-        let mut idx_file = disk_map.contents.len() - 1;
+        let mut idx_file = disk_map.len() - 1;
         while idx_file > 0 {
             let mut idx_free_space = 1;
             while idx_free_space < idx_file {
-                if disk_map.contents[idx_free_space].length >= disk_map.contents[idx_file].length {
-                    let file = disk_map.contents.remove(idx_file).unwrap();
-                    disk_map.contents[idx_file - 1].length += file.length;
-                    if idx_file < disk_map.contents.len() {
-                        disk_map.contents[idx_file - 1].length +=
-                            disk_map.contents[idx_file].length;
-                        disk_map.contents.remove(idx_file);
+                if disk_map[idx_free_space].length >= disk_map[idx_file].length {
+                    disk_map[idx_free_space..=idx_file].rotate_right(2);
+
+                    if idx_file + 1 < disk_map.len() {
+                        disk_map[idx_file + 1].length +=
+                            disk_map[idx_free_space].length + disk_map[idx_free_space + 1].length;
                     }
-                    disk_map.contents[idx_free_space].length -= file.length;
-                    disk_map.contents.insert(idx_free_space, file);
-                    disk_map.contents.insert(
-                        idx_free_space,
-                        DiskContent {
-                            length: 0,
-                            content: DiskBlock::FreeSpace,
-                        },
-                    );
+                    disk_map[idx_free_space + 2].length -= disk_map[idx_free_space + 1].length;
+                    disk_map[idx_free_space].length = 0;
+
                     idx_file += 2;
                     break;
                 }
