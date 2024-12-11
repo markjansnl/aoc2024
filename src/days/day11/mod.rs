@@ -1,7 +1,8 @@
 use memoize::memoize;
 
 use nom::{
-    character::complete::{space1, u64},
+    bytes::complete::tag,
+    character::complete::u64,
     combinator::all_consuming,
     multi::separated_list1,
 };
@@ -58,7 +59,7 @@ impl Parser {
 
     #[inline]
     fn stones(s: &'static str) -> IResult<Parsed> {
-        separated_list1(space1, u64)(s)
+        separated_list1(tag(" "), u64)(s)
     }
 }
 
