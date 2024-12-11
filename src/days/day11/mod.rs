@@ -40,7 +40,7 @@ fn count_after_blinks(stone: u64, blinks: u8) -> usize {
         count_after_blinks(1, blinks - 1)
     } else {
         let digits = format!("{stone}").len() as u32;
-        if digits > 0 && digits % 2 == 0 {
+        if digits % 2 == 0 {
             let half_div = 10u64.pow(digits / 2);
             count_after_blinks(stone / half_div, blinks - 1)
                 + count_after_blinks(stone % half_div, blinks - 1)
