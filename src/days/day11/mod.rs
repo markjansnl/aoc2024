@@ -5,7 +5,6 @@ use nom::{
     combinator::all_consuming,
     multi::separated_list1,
 };
-use rayon::prelude::*;
 
 use crate::*;
 
@@ -18,8 +17,7 @@ impl Day {
     #[inline]
     fn part1(stones: Parsed) -> Result<Output> {
         Ok(stones
-            .par_iter()
-            .copied()
+            .into_iter()
             .map(|stone| count_after_blinks(stone, 25))
             .sum())
     }
@@ -27,8 +25,7 @@ impl Day {
     #[inline]
     fn part2(stones: Parsed) -> Result<Output> {
         Ok(stones
-            .par_iter()
-            .copied()
+            .into_iter()
             .map(|stone| count_after_blinks(stone, 75))
             .sum())
     }
