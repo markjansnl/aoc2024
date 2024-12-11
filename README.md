@@ -11,12 +11,12 @@ In this repository you can find the source code of my solutions to the [Advent o
 **Step 3**: Run the solutions using `cargo run [ -- <PARAMETERS> ]`. The following parameters are supported:
 * `--download`:         Download input files. See `--all`, `--day` and `--part` to specify which input files to download.
                         Default the input file of 'today' is downloaded.
-* `--all`:              Same as specifying all days and all parts using `--day` and `part`.
 * `--day XX,XX,...`:    Download or run only specified days, comma separated. When no `--day` or `--all` is provided, only day 'today' is downloaded or run.
 * `--part XX,XX`:       Run only the specified parts, comma separated. When no `--part` or `--all` is provided, only part 1 is run.
+* `--all`:              Same as specifying all days and all parts using `--day` and `--part`.
 * `--help`:             Show help and available parameters.
 
-**Step 4**: Benchmark the code on your own system using `cargo bench`.
+**Step 4**: [Benchmark](#benchmarks) the code on your own system using `cargo bench`.
 
 ## Framework
 
