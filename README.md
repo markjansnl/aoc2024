@@ -1,6 +1,6 @@
 # Advent of Code 2024
 
-In this repository you can find the source code of my solutions to the [Advent of Code 2023](https://adventofcode.com/2023) puzzles in the [Rust](https://www.rust-lang.org/) programming language.
+In this repository you can find the source code of my solutions to the [Advent of Code 2024](https://adventofcode.com/2024) puzzles in the [Rust](https://www.rust-lang.org/) programming language.
 
 ## Setup
 
