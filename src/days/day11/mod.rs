@@ -35,6 +35,7 @@ impl Day {
 }
 
 #[memoize]
+#[inline]
 fn count_after_blinks(stone: u64, blinks: u8) -> usize {
     if blinks == 0 {
         1
