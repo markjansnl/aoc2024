@@ -16,10 +16,13 @@ struct Map {
     heigth: usize,
 }
 
+type FencesPart1 = usize;
+type FencesPart2 = BTreeSet<FenceLocation>;
+
 #[derive(Default)]
-struct Region {
+struct Region<F: Fences> {
     area: usize,
-    fences: BTreeSet<FenceLocation>,
+    fences: F,
 }
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy)]
@@ -111,16 +114,39 @@ impl<'a> LocationSet<'a> {
     }
 }
 
-impl Region {
+trait Fences: Default {
+    fn insert(&mut self, location: Location, direction: Direction);
+    fn len(&self) -> usize;
+    fn iter(&self) -> impl Iterator<Item = &FenceLocation>;
+}
+
+impl Fences for FencesPart1 {
     #[inline]
-    fn insert_fence(&mut self, location: Location, direction: Direction) {
+    fn insert(&mut self, _location: Location, _direction: Direction) {
+        *self += 1;
+    }
+
+    #[inline]
+    fn len(&self) -> usize {
+        *self
+    }
+
+    #[inline]
+    fn iter(&self) -> impl Iterator<Item = &FenceLocation> {
+        std::vec::IntoIter::<_>::default()
+    }
+}
+
+impl Fences for FencesPart2 {
+    #[inline]
+    fn insert(&mut self, location: Location, direction: Direction) {
         match direction {
-            Left | Right => self.fences.insert(FenceLocation {
+            Left | Right => self.insert(FenceLocation {
                 direction,
                 a: location.x,
                 b: location.y,
             }),
-            Up | Down => self.fences.insert(FenceLocation {
+            Up | Down => self.insert(FenceLocation {
                 direction,
                 a: location.y,
                 b: location.x,
@@ -128,6 +154,18 @@ impl Region {
         };
     }
 
+    #[inline]
+    fn len(&self) -> usize {
+        self.len()
+    }
+
+    #[inline]
+    fn iter(&self) -> impl Iterator<Item = &FenceLocation> {
+        self.iter()
+    }
+}
+
+impl<F: Fences> Region<F> {
     #[inline]
     fn total_price(&self) -> Output {
         self.area * self.fences.len()
@@ -168,7 +206,7 @@ impl Map {
     }
 
     #[inline]
-    fn regions(&self) -> Vec<Region> {
+    fn regions<F: Fences>(&self) -> Vec<Region<F>> {
         let mut visited = LocationSet::with_map(self);
         let mut visit = LocationSet::with_map(self);
         let mut regions = vec![];
@@ -185,11 +223,11 @@ impl Map {
     }
 
     #[inline]
-    fn find_regions(
+    fn find_regions<F: Fences>(
         &self,
         location: Location,
         plant: u8,
-        region: &mut Region,
+        region: &mut Region<F>,
         visited: &mut LocationSet,
         visit: &mut LocationSet,
     ) {
@@ -205,13 +243,13 @@ impl Map {
                         self.find_regions(next_location, plant, region, visited, visit);
                     }
                 } else {
-                    region.insert_fence(location, direction);
+                    region.fences.insert(location, direction);
                     if !visited.contains(next_location) {
                         visit.insert(next_location);
                     }
                 }
             } else {
-                region.insert_fence(location, direction);
+                region.fences.insert(location, direction);
             }
         }
     }
@@ -223,7 +261,7 @@ impl Day {
         Ok(map
             .regions()
             .into_iter()
-            .map(|region| region.total_price())
+            .map(|region: Region<FencesPart1>| region.total_price())
             .sum())
     }
 
@@ -232,7 +270,7 @@ impl Day {
         Ok(map
             .regions()
             .into_iter()
-            .map(|region| region.bulk_discount())
+            .map(|region: Region<FencesPart2>| region.bulk_discount())
             .sum())
     }
 }
