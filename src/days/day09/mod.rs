@@ -78,27 +78,29 @@ impl Day {
         let mut idx_checksum = 0;
         let mut idx_front = 0;
         let mut idx_back = disk_blocks.len() - 1;
-        while idx_front < idx_back {
+        while idx_front <= idx_back {
             match disk_blocks[idx_front] {
                 DiskBlock::File { id } => {
                     idx_front += 1;
                     checksum += idx_checksum * id;
                     idx_checksum += 1
                 }
-                DiskBlock::FreeSpace => loop {
+                DiskBlock::FreeSpace => {
                     idx_front += 1;
-                    match disk_blocks[idx_back] {
-                        DiskBlock::File { id } => {
-                            idx_back -= 1;
-                            checksum += idx_checksum * id;
-                            idx_checksum += 1;
-                            break;
-                        }
-                        DiskBlock::FreeSpace => {
-                            idx_back -= 1;
+                    while idx_front <= idx_back {
+                        match disk_blocks[idx_back] {
+                            DiskBlock::File { id } => {
+                                idx_back -= 1;
+                                checksum += idx_checksum * id;
+                                idx_checksum += 1;
+                                break;
+                            }
+                            DiskBlock::FreeSpace => {
+                                idx_back -= 1;
+                            }
                         }
                     }
-                },
+                }
             }
         }
 
