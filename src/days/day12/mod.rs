@@ -1,4 +1,8 @@
+use std::collections::BTreeSet;
+
 use crate::*;
+
+use Direction::*;
 
 day! {
     Output = usize,
@@ -15,46 +19,28 @@ struct Map {
 #[derive(Default)]
 struct Region {
     area: usize,
-    perimeter: usize,
+    fences: BTreeSet<FenceLocation>,
 }
 
-#[derive(Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy)]
+enum Direction {
+    Right,
+    Left,
+    Up,
+    Down,
+}
+
+#[derive(Default, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy)]
 struct Location {
     x: isize,
     y: isize,
 }
 
-impl Location {
-    #[inline]
-    fn left(&self) -> Location {
-        Self {
-            x: self.x - 1,
-            y: self.y,
-        }
-    }
-
-    #[inline]
-    fn right(&self) -> Location {
-        Self {
-            x: self.x + 1,
-            y: self.y,
-        }
-    }
-
-    fn up(&self) -> Location {
-        Self {
-            x: self.x,
-            y: self.y - 1,
-        }
-    }
-
-    #[inline]
-    fn down(&self) -> Location {
-        Self {
-            x: self.x,
-            y: self.y + 1,
-        }
-    }
+#[derive(PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy)]
+struct FenceLocation {
+    direction: Direction,
+    a: isize,
+    b: isize,
 }
 
 struct LocationSet<'a> {
@@ -62,15 +48,43 @@ struct LocationSet<'a> {
     locations: [bool; 20_000],
 }
 
+impl Location {
+    #[inline]
+    fn next(&self, direction: Direction) -> Location {
+        match direction {
+            Right => Self {
+                x: self.x + 1,
+                y: self.y,
+            },
+            Left => Self {
+                x: self.x - 1,
+                y: self.y,
+            },
+            Up => Self {
+                x: self.x,
+                y: self.y - 1,
+            },
+            Down => Self {
+                x: self.x,
+                y: self.y + 1,
+            },
+        }
+    }
+}
+
 impl<'a> LocationSet<'a> {
     #[inline]
     fn with_map(map: &'a Map) -> Self {
-        LocationSet { map, locations: [false; 20_000] }
+        LocationSet {
+            map,
+            locations: [false; 20_000],
+        }
     }
 
     #[inline]
     fn insert(&mut self, location: Location) {
-        self.locations[location.y as usize * self.map.width_incl_newline + location.x as usize] = true;
+        self.locations[location.y as usize * self.map.width_incl_newline + location.x as usize] =
+            true;
     }
 
     #[inline]
@@ -80,15 +94,62 @@ impl<'a> LocationSet<'a> {
 
     #[inline]
     fn remove(&mut self, location: Location) {
-        self.locations[location.y as usize * self.map.width_incl_newline + location.x as usize] = false;
+        self.locations[location.y as usize * self.map.width_incl_newline + location.x as usize] =
+            false;
     }
 
     #[inline]
     fn first(&mut self) -> Option<Location> {
-        self.locations.iter().enumerate().find(|(_, contains)| **contains).map(|(idx, _)| Location {
-            x: (idx % self.map.width_incl_newline) as isize,
-            y: (idx / self.map.width_incl_newline) as isize,
-        })
+        self.locations
+            .iter()
+            .enumerate()
+            .find(|(_, contains)| **contains)
+            .map(|(idx, _)| Location {
+                x: (idx % self.map.width_incl_newline) as isize,
+                y: (idx / self.map.width_incl_newline) as isize,
+            })
+    }
+}
+
+impl Region {
+    #[inline]
+    fn insert_fence(&mut self, location: Location, direction: Direction) {
+        match direction {
+            Left | Right => self.fences.insert(FenceLocation {
+                direction,
+                a: location.x,
+                b: location.y,
+            }),
+            Up | Down => self.fences.insert(FenceLocation {
+                direction,
+                a: location.y,
+                b: location.x,
+            }),
+        };
+    }
+
+    #[inline]
+    fn total_price(&self) -> Output {
+        self.area * self.fences.len()
+    }
+
+    #[inline]
+    fn bulk_discount(&self) -> Output {
+        self.area * self.count_sides()
+    }
+
+    #[inline]
+    fn count_sides(&self) -> Output {
+        let mut fences_iter = self.fences.iter();
+        let mut prev = fences_iter.next().unwrap();
+        let mut sides = 1;
+        for next in fences_iter {
+            if next.direction != prev.direction || next.a != prev.a || next.b != prev.b + 1 {
+                sides += 1;
+            }
+            prev = next;
+        }
+        sides
     }
 }
 
@@ -108,20 +169,15 @@ impl Map {
 
     #[inline]
     fn regions(&self) -> Vec<Region> {
-        let mut visited = LocationSet::with_map(&self);
-        let mut visit = LocationSet::with_map(&self);
+        let mut visited = LocationSet::with_map(self);
+        let mut visit = LocationSet::with_map(self);
         let mut regions = vec![];
 
         visit.insert(Location::default());
         while let Some(location) = visit.first() {
+            let plant = self.get(location).unwrap();
             let mut region = Region::default();
-            self.find_regions(
-                location,
-                self.get(location).unwrap(),
-                &mut region,
-                &mut visited,
-                &mut visit,
-            );
+            self.find_regions(location, plant, &mut region, &mut visited, &mut visit);
             regions.push(region);
         }
 
@@ -141,25 +197,21 @@ impl Map {
         visited.insert(location);
         region.area += 1;
 
-        for next_location in [
-            location.right(),
-            location.down(),
-            location.left(),
-            location.up(),
-        ] {
+        for direction in [Right, Down, Left, Up] {
+            let next_location = location.next(direction);
             if let Some(next_plant) = self.get(next_location) {
                 if next_plant == plant {
                     if !visited.contains(next_location) {
                         self.find_regions(next_location, plant, region, visited, visit);
                     }
                 } else {
-                    region.perimeter += 1;
+                    region.insert_fence(location, direction);
                     if !visited.contains(next_location) {
                         visit.insert(next_location);
                     }
                 }
             } else {
-                region.perimeter += 1;
+                region.insert_fence(location, direction);
             }
         }
     }
@@ -171,13 +223,17 @@ impl Day {
         Ok(map
             .regions()
             .into_iter()
-            .map(|Region { area, perimeter }| area * perimeter)
+            .map(|region| region.total_price())
             .sum())
     }
 
     #[inline]
-    fn part2(_parsed: Parsed) -> Result<Output> {
-        Ok(0)
+    fn part2(map: Parsed) -> Result<Output> {
+        Ok(map
+            .regions()
+            .into_iter()
+            .map(|region| region.bulk_discount())
+            .sum())
     }
 }
 
@@ -209,5 +265,13 @@ mod tests {
 
     test_example!("example3", Part1, 1930);
 
-    test_example!("example1", Part2, 0);
+    test_example!("example1", Part2, 80);
+
+    test_example!("example2", Part2, 436);
+
+    test_example!("example3", Part2, 1206);
+
+    test_example!("example4", Part2, 236);
+
+    test_example!("example5", Part2, 368);
 }
