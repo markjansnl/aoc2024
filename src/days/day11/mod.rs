@@ -61,6 +61,7 @@ impl Iterator for StoneIter {
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(bytes) = &mut self.bytes {
+            #[allow(clippy::while_let_on_iterator)]
             while let Some(b) = bytes.next() {
                 if b == 32 {
                     let next = self.number;
