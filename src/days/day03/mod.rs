@@ -24,7 +24,6 @@ enum Instruction {
 }
 
 impl Day {
-    #[inline]
     fn part1(parsed: Parsed) -> Result<Output> {
         Ok(parsed
             .into_iter()
@@ -35,7 +34,6 @@ impl Day {
             .sum())
     }
 
-    #[inline]
     fn part2(parsed: Parsed) -> Result<Output> {
         Ok(parsed
             .into_iter()
@@ -50,22 +48,18 @@ impl Day {
 }
 
 impl Parser {
-    #[inline]
     fn parse(input: &'static str) -> Result<Parsed> {
         Ok(all_consuming(Self::instructions)(input)?.1)
     }
 
-    #[inline]
     fn instructions(s: &'static str) -> IResult<Parsed> {
         many1(Self::instruction)(s)
     }
 
-    #[inline]
     fn instruction(s: &'static str) -> IResult<Instruction> {
         alt((Self::mul, Self::parse_do, Self::dont, Self::invalid))(s)
     }
 
-    #[inline]
     fn mul(s: &'static str) -> IResult<Instruction> {
         map(
             preceded(
@@ -79,22 +73,18 @@ impl Parser {
         )(s)
     }
 
-    #[inline]
     fn parse_do(s: &'static str) -> IResult<Instruction> {
         map(tag("do()"), |_| Instruction::Do)(s)
     }
 
-    #[inline]
     fn dont(s: &'static str) -> IResult<Instruction> {
         map(tag("don't()"), |_| Instruction::Dont)(s)
     }
 
-    #[inline]
     fn invalid(s: &'static str) -> IResult<Instruction> {
         map(anychar, |_| Instruction::Invalid)(s)
     }
 
-    #[inline]
     fn u32_max_999(s: &'static str) -> IResult<Output> {
         map_res(u32, |n| {
             if n <= 999 {

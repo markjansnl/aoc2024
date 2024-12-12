@@ -8,7 +8,6 @@ day! {
 }
 
 impl Day {
-    #[inline]
     fn part1(lines: Parsed) -> Result<Output> {
         let mut sum = 0;
         for (y, line) in lines.iter().enumerate() {
@@ -23,7 +22,6 @@ impl Day {
         Ok(sum)
     }
 
-    #[inline]
     fn part2(lines: Parsed) -> Result<Output> {
         let mut sum = 0;
         for (y, line) in lines.iter().enumerate() {
@@ -36,7 +34,6 @@ impl Day {
         Ok(sum)
     }
 
-    #[inline]
     fn trail_score(
         lines: &Parsed,
         x: isize,
@@ -70,7 +67,6 @@ impl Day {
         }
     }
 
-    #[inline]
     fn trail_rating(lines: &Parsed, x: isize, y: isize, height: u8) -> usize {
         if height == 9 {
             1
@@ -100,7 +96,6 @@ impl Day {
         }
     }
 
-    #[inline]
     fn get(lines: &Parsed, x: isize, y: isize) -> Option<u8> {
         if y < 0 || y >= lines.len() as isize || x < 0 || x >= lines[0].len() as isize {
             None
@@ -111,7 +106,6 @@ impl Day {
 }
 
 impl Parser {
-    #[inline]
     fn parse(input: &'static str) -> Result<Parsed> {
         Ok(input
             .lines()

@@ -10,7 +10,6 @@ struct Puzzle {
 }
 
 impl FromIterator<String> for Puzzle {
-    #[inline]
     fn from_iter<T: IntoIterator<Item = String>>(iter: T) -> Self {
         Self {
             lines: Vec::from_iter(iter),
@@ -19,7 +18,6 @@ impl FromIterator<String> for Puzzle {
 }
 
 impl Puzzle {
-    #[inline]
     fn count_xmas_part1(&self) -> Output {
         self.lines
             .iter()
@@ -45,14 +43,12 @@ impl Puzzle {
             .sum()
     }
 
-    #[inline]
     fn check_mas(&self, y: isize, x: isize, offset_y: isize, offset_x: isize) -> bool {
         self.get(y + offset_y, x + offset_x) == "M"
             && self.get(y + offset_y * 2, x + offset_x * 2) == "A"
             && self.get(y + offset_y * 3, x + offset_x * 3) == "S"
     }
 
-    #[inline]
     fn get(&self, y: isize, x: isize) -> &str {
         if y >= 0 && y < self.lines.len() as isize && x >= 0 && x < self.lines[0].len() as isize {
             &self.lines[y as usize][x as usize..=x as usize]
@@ -61,7 +57,6 @@ impl Puzzle {
         }
     }
 
-    #[inline]
     fn count_xmas_part2(&self) -> Output {
         self.lines
             .iter()
@@ -87,7 +82,6 @@ impl Puzzle {
             .count()
     }
 
-    #[inline]
     fn check_m_s(
         &self,
         y: usize,
@@ -106,19 +100,16 @@ impl Puzzle {
 }
 
 impl Day {
-    #[inline]
     fn part1(puzzle: Parsed) -> Result<Output> {
         Ok(puzzle.count_xmas_part1())
     }
 
-    #[inline]
     fn part2(puzzle: Parsed) -> Result<Output> {
         Ok(puzzle.count_xmas_part2())
     }
 }
 
 impl Parser {
-    #[inline]
     fn parse(input: &'static str) -> Result<Parsed> {
         Ok(input.lines().map(String::from).collect())
     }

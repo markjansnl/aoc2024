@@ -39,7 +39,6 @@ enum Direction {
 }
 
 impl Direction {
-    #[inline]
     fn rotate_clockwise(&mut self) {
         *self = match self {
             Direction::North => Direction::East,
@@ -51,7 +50,6 @@ impl Direction {
 }
 
 impl Location {
-    #[inline]
     fn next(&self, direction: Direction) -> Location {
         let Location { x, y } = *self;
         match direction {
@@ -64,7 +62,6 @@ impl Location {
 }
 
 impl Day {
-    #[inline]
     fn part1(lines: Parsed) -> Result<Output> {
         let mut location = Self::find_guard(&lines)?;
         let mut direction = Direction::North;
@@ -84,7 +81,6 @@ impl Day {
         Ok(visited.len())
     }
 
-    #[inline]
     fn part2(lines: Parsed) -> Result<Output> {
         let mut location = Self::find_guard(&lines)?;
         let mut direction = Direction::North;
@@ -114,7 +110,6 @@ impl Day {
         Ok(extra_obstructions.len())
     }
 
-    #[inline]
     fn find_guard(lines: &Parsed) -> Result<Location> {
         for (y, tiles) in lines.iter().enumerate() {
             for (x, tile) in tiles.iter().enumerate() {
@@ -129,7 +124,6 @@ impl Day {
         bail!("Guard not found");
     }
 
-    #[inline]
     fn get(lines: &Parsed, Location { x, y }: Location) -> Option<Tile> {
         if y < 0 || y >= lines.len() as isize || x < 0 || x >= lines[0].len() as isize {
             None
@@ -138,7 +132,6 @@ impl Day {
         }
     }
 
-    #[inline]
     fn can_place_obstruction(
         lines: &Parsed,
         location: Location,
@@ -175,22 +168,18 @@ impl Day {
 }
 
 impl Parser {
-    #[inline]
     fn parse(input: &'static str) -> Result<Parsed> {
         Ok(all_consuming(Self::lines)(input)?.1)
     }
 
-    #[inline]
     fn lines(s: &'static str) -> IResult<Parsed> {
         separated_list1(newline, Self::tiles)(s)
     }
 
-    #[inline]
     fn tiles(s: &'static str) -> IResult<Vec<Tile>> {
         many1(Self::tile)(s)
     }
 
-    #[inline]
     fn tile(s: &'static str) -> IResult<Tile> {
         alt((
             map(tag("#"), |_| Tile::Obstruction),

@@ -9,7 +9,7 @@ use crate::*;
 day! {
     Output = usize,
     Parsed = DiskMap,
-    bench_sample_size: 90,
+    bench_sample_size: 80,
 }
 
 struct DiskMap {
@@ -33,7 +33,6 @@ where
 {
     type Output = <Idx as SliceIndex<[DiskContent]>>::Output;
 
-    #[inline]
     fn index(&self, index: Idx) -> &Self::Output {
         self.contents.index(index)
     }
@@ -43,14 +42,12 @@ impl<Idx> IndexMut<Idx> for DiskMap
 where
     Idx: SliceIndex<[DiskContent]>,
 {
-    #[inline]
     fn index_mut(&mut self, index: Idx) -> &mut Self::Output {
         self.contents.index_mut(index)
     }
 }
 
 impl DiskMap {
-    #[inline]
     fn len(&self) -> usize {
         self.contents.len()
     }
@@ -60,7 +57,6 @@ impl IntoIterator for DiskMap {
     type Item = DiskBlock;
     type IntoIter = Flatten<std::vec::IntoIter<DiskContent>>;
 
-    #[inline]
     fn into_iter(self) -> Self::IntoIter {
         self.contents.into_iter().flatten()
     }
@@ -70,14 +66,12 @@ impl IntoIterator for DiskContent {
     type Item = DiskBlock;
     type IntoIter = RepeatN<Self::Item>;
 
-    #[inline]
     fn into_iter(self) -> Self::IntoIter {
         repeat_n(self.content, self.length)
     }
 }
 
 impl Day {
-    #[inline]
     fn part1(disk_map: Parsed) -> Result<Output> {
         let disk_blocks = Vec::from_iter(disk_map);
         let mut checksum = 0;
@@ -111,7 +105,6 @@ impl Day {
         Ok(checksum)
     }
 
-    #[inline]
     fn part2(mut disk_map: Parsed) -> Result<Output> {
         let mut idx_file = disk_map.len() - 1;
         while idx_file > 0 {
@@ -147,7 +140,6 @@ impl Day {
 }
 
 impl Parser {
-    #[inline]
     fn parse(input: &'static str) -> Result<Parsed> {
         Ok(DiskMap {
             contents: input

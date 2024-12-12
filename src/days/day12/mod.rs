@@ -7,6 +7,7 @@ use Direction::*;
 day! {
     Output = usize,
     Parsed = Map,
+    bench_sample_size: 50,
 }
 
 struct Map {
@@ -52,7 +53,6 @@ struct LocationSet<'a> {
 }
 
 impl Location {
-    #[inline]
     fn next(&self, direction: Direction) -> Location {
         match direction {
             Right => Self {
@@ -76,7 +76,6 @@ impl Location {
 }
 
 impl<'a> LocationSet<'a> {
-    #[inline]
     fn with_map(map: &'a Map) -> Self {
         LocationSet {
             map,
@@ -84,24 +83,20 @@ impl<'a> LocationSet<'a> {
         }
     }
 
-    #[inline]
     fn insert(&mut self, location: Location) {
         self.locations[location.y as usize * self.map.width_incl_newline + location.x as usize] =
             true;
     }
 
-    #[inline]
     fn contains(&mut self, location: Location) -> bool {
         self.locations[location.y as usize * self.map.width_incl_newline + location.x as usize]
     }
 
-    #[inline]
     fn remove(&mut self, location: Location) {
         self.locations[location.y as usize * self.map.width_incl_newline + location.x as usize] =
             false;
     }
 
-    #[inline]
     fn first(&mut self) -> Option<Location> {
         self.locations
             .iter()
@@ -121,24 +116,20 @@ trait Fences: Default {
 }
 
 impl Fences for FencesPart1 {
-    #[inline]
     fn insert(&mut self, _location: Location, _direction: Direction) {
         *self += 1;
     }
 
-    #[inline]
     fn len(&self) -> usize {
         *self
     }
 
-    #[inline]
     fn iter(&self) -> impl Iterator<Item = &FenceLocation> {
         std::vec::IntoIter::<_>::default()
     }
 }
 
 impl Fences for FencesPart2 {
-    #[inline]
     fn insert(&mut self, location: Location, direction: Direction) {
         match direction {
             Left | Right => self.insert(FenceLocation {
@@ -154,29 +145,24 @@ impl Fences for FencesPart2 {
         };
     }
 
-    #[inline]
     fn len(&self) -> usize {
         self.len()
     }
 
-    #[inline]
     fn iter(&self) -> impl Iterator<Item = &FenceLocation> {
         self.iter()
     }
 }
 
 impl<F: Fences> Region<F> {
-    #[inline]
     fn total_price(&self) -> Output {
         self.area * self.fences.len()
     }
 
-    #[inline]
     fn bulk_discount(&self) -> Output {
         self.area * self.count_sides()
     }
 
-    #[inline]
     fn count_sides(&self) -> Output {
         let mut fences_iter = self.fences.iter();
         let mut prev = fences_iter.next().unwrap();
@@ -192,7 +178,6 @@ impl<F: Fences> Region<F> {
 }
 
 impl Map {
-    #[inline]
     fn get(&self, location: Location) -> Option<u8> {
         if location.y < 0
             || location.y as usize >= self.heigth
@@ -205,7 +190,6 @@ impl Map {
         }
     }
 
-    #[inline]
     fn regions<F: Fences>(&self) -> Vec<Region<F>> {
         let mut visited = LocationSet::with_map(self);
         let mut visit = LocationSet::with_map(self);
@@ -222,7 +206,6 @@ impl Map {
         regions
     }
 
-    #[inline]
     fn find_regions<F: Fences>(
         &self,
         location: Location,
@@ -256,7 +239,6 @@ impl Map {
 }
 
 impl Day {
-    #[inline]
     fn part1(map: Parsed) -> Result<Output> {
         Ok(map
             .regions()
@@ -265,7 +247,6 @@ impl Day {
             .sum())
     }
 
-    #[inline]
     fn part2(map: Parsed) -> Result<Output> {
         Ok(map
             .regions()
@@ -276,7 +257,6 @@ impl Day {
 }
 
 impl Parser {
-    #[inline]
     fn parse(input: &'static str) -> Result<Parsed> {
         let width = input.find('\n').unwrap();
         let width_incl_newline = width + 1;

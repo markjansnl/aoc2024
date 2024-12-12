@@ -8,24 +8,20 @@ day! {
 }
 
 impl Day {
-    #[inline]
     fn part1(parsed: Parsed) -> Result<Output> {
         Ok(parsed)
     }
 
-    #[inline]
     fn part2(_parsed: Parsed) -> Result<Output> {
         Ok(0)
     }
 }
 
 impl Parser {
-    #[inline]
     fn parse(input: &'static str) -> Result<Parsed> {
         Ok(all_consuming(Self::integer)(input)?.1)
     }
 
-    #[inline]
     fn integer(s: &'static str) -> IResult<Parsed> {
         u32(s)
     }

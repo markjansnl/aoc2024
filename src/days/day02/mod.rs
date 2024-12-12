@@ -21,7 +21,6 @@ enum Ordering {
 }
 
 impl Day {
-    #[inline]
     fn part1(reports: Parsed) -> Result<Output> {
         Ok(reports
             .into_iter()
@@ -29,7 +28,6 @@ impl Day {
             .count() as Output)
     }
 
-    #[inline]
     fn part2(reports: Parsed) -> Result<Output> {
         Ok(reports
             .into_iter()
@@ -37,7 +35,6 @@ impl Day {
             .count() as Output)
     }
 
-    #[inline]
     fn is_safe(report: &[Output], tolerance: bool, exclude: Option<usize>) -> bool {
         if exclude == Some(0) {
             return Self::is_safe(&report[1..], false, None);
@@ -71,7 +68,6 @@ impl Day {
         true
     }
 
-    #[inline]
     fn check_ordering(prev: Output, next: Output) -> Option<Ordering> {
         match prev.cmp(&next) {
             Equal => None,
@@ -82,17 +78,14 @@ impl Day {
 }
 
 impl Parser {
-    #[inline]
     fn parse(input: &'static str) -> Result<Parsed> {
         Ok(all_consuming(Self::reports)(input)?.1)
     }
 
-    #[inline]
     fn reports(s: &'static str) -> IResult<Parsed> {
         separated_list1(newline, Self::report)(s)
     }
 
-    #[inline]
     fn report(s: &'static str) -> IResult<Vec<Output>> {
         separated_list1(space1, u32)(s)
     }

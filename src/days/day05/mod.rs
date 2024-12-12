@@ -33,7 +33,6 @@ struct OrderingRulesSet {
 }
 
 impl From<&Vec<OrderingRule>> for OrderingRulesSet {
-    #[inline]
     fn from(ordering_rules: &Vec<OrderingRule>) -> Self {
         let mut ordering_rules_set = [false; 10_000];
         for ordering_rule in ordering_rules {
@@ -44,7 +43,6 @@ impl From<&Vec<OrderingRule>> for OrderingRulesSet {
 }
 
 impl OrderingRulesSet {
-    #[inline]
     fn contains(&self, before: &PageNumber, after: &PageNumber) -> bool {
         self.ordering_rules_set[before * 100 + after]
     }
@@ -55,7 +53,6 @@ trait MiddlePageNumber {
 }
 
 impl MiddlePageNumber for Vec<PageNumber> {
-    #[inline]
     fn middle_page_number(&self) -> PageNumber {
         self[(self.len() - 1) / 2]
     }
@@ -67,7 +64,6 @@ trait SectionOrdering {
 }
 
 impl SectionOrdering for Section {
-    #[inline]
     fn correctly_ordered(&self, ordering_rules: &[OrderingRule]) -> bool {
         let mut indices = [None; 100];
         for (idx, &page) in self.iter().enumerate() {
@@ -81,7 +77,6 @@ impl SectionOrdering for Section {
         })
     }
 
-    #[inline]
     fn reorder(&self, ordering_rules_set: &OrderingRulesSet) -> Self {
         let mut reordered = self.clone();
         reordered.sort_by(|a, b| {
@@ -98,7 +93,6 @@ impl SectionOrdering for Section {
 }
 
 impl Day {
-    #[inline]
     fn part1(input: Parsed) -> Result<Output> {
         Ok(input
             .sections
@@ -108,7 +102,6 @@ impl Day {
             .sum())
     }
 
-    #[inline]
     fn part2(input: Parsed) -> Result<Output> {
         let ordering_rules_set = OrderingRulesSet::from(&input.ordering_rules);
         Ok(input
@@ -121,12 +114,10 @@ impl Day {
 }
 
 impl Parser {
-    #[inline]
     fn parse(input: &'static str) -> Result<Parsed> {
         Ok(all_consuming(Self::input)(input)?.1)
     }
 
-    #[inline]
     fn input(s: &'static str) -> IResult<Input> {
         map(
             separated_pair(Self::ordering_rules, pair(newline, newline), Self::sections),
@@ -137,12 +128,10 @@ impl Parser {
         )(s)
     }
 
-    #[inline]
     fn ordering_rules(s: &'static str) -> IResult<Vec<OrderingRule>> {
         separated_list1(newline, Self::ordering_rule)(s)
     }
 
-    #[inline]
     fn ordering_rule(s: &'static str) -> IResult<OrderingRule> {
         map(separated_pair(u8, tag("|"), u8), |(before, after)| {
             OrderingRule {
@@ -152,12 +141,10 @@ impl Parser {
         })(s)
     }
 
-    #[inline]
     fn sections(s: &'static str) -> IResult<Vec<Section>> {
         separated_list1(newline, Self::pages)(s)
     }
 
-    #[inline]
     fn pages(s: &'static str) -> IResult<Vec<PageNumber>> {
         separated_list1(tag(","), map(u8, |page| page as usize))(s)
     }

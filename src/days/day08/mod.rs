@@ -23,14 +23,12 @@ struct Location {
 }
 
 impl Map {
-    #[inline]
     fn contains(&self, location: Location) -> bool {
         location.x >= 0 && location.x < self.width && location.y >= 0 && location.y < self.height
     }
 }
 
 impl Day {
-    #[inline]
     fn part1(map: Parsed) -> Result<Output> {
         let mut antinodes = HashSet::new();
         for locations in map.antennas.values() {
@@ -52,7 +50,6 @@ impl Day {
         Ok(antinodes.len())
     }
 
-    #[inline]
     fn part2(map: Parsed) -> Result<Output> {
         let mut antinodes = HashSet::new();
         for locations in map.antennas.values() {
@@ -87,7 +84,6 @@ impl Day {
         Ok(antinodes.len())
     }
 
-    #[inline]
     fn next_antinode(a: Location, b: Location) -> Location {
         Location {
             x: 2 * b.x - a.x,
@@ -97,7 +93,6 @@ impl Day {
 }
 
 impl Parser {
-    #[inline]
     fn parse(input: &'static str) -> Result<Parsed> {
         let mut antennas: HashMap<Antenna, Vec<Location>> = HashMap::new();
         let mut width = 0;

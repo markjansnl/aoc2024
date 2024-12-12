@@ -16,12 +16,10 @@ day! {
 }
 
 impl Day {
-    #[inline]
     fn part1((left, right): Parsed) -> Result<Output> {
         Ok(zip(left, right).map(|(l, r)| l.abs_diff(r)).sum())
     }
 
-    #[inline]
     fn part2((left, right): Parsed) -> Result<Output> {
         let mut left_iter = left.into_iter().peekable();
         let mut right_iter = right.into_iter().peekable();
@@ -54,7 +52,6 @@ impl Day {
 }
 
 impl Parser {
-    #[inline]
     fn parse(input: &'static str) -> Result<Parsed> {
         let pairs = all_consuming(Self::pairs)(input)?.1;
         let (mut left, mut right): (Vec<_>, Vec<_>) = pairs.into_iter().unzip();
@@ -63,12 +60,10 @@ impl Parser {
         Ok((left, right))
     }
 
-    #[inline]
     fn pairs(s: &'static str) -> IResult<Vec<(Output, Output)>> {
         separated_list1(newline, Self::pair)(s)
     }
 
-    #[inline]
     fn pair(s: &'static str) -> IResult<(Output, Output)> {
         separated_pair(u32, space1, u32)(s)
     }

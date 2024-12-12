@@ -23,7 +23,6 @@ struct CalibrationEquation {
 }
 
 impl Day {
-    #[inline]
     fn part1(calibration: Parsed) -> Result<Output> {
         Ok(calibration
             .into_iter()
@@ -38,7 +37,6 @@ impl Day {
             .sum())
     }
 
-    #[inline]
     fn part2(calibration: Parsed) -> Result<Output> {
         Ok(calibration
             .into_par_iter()
@@ -53,7 +51,6 @@ impl Day {
             .sum())
     }
 
-    #[inline]
     fn check_part1(evaluated: Number, numbers: &[Number], test_value: Number) -> bool {
         if numbers.is_empty() {
             evaluated == test_value
@@ -65,7 +62,6 @@ impl Day {
         }
     }
 
-    #[inline]
     fn check_part2(evaluated: Number, numbers: &[Number], test_value: Number) -> bool {
         if numbers.is_empty() {
             evaluated == test_value
@@ -84,17 +80,14 @@ impl Day {
 }
 
 impl Parser {
-    #[inline]
     fn parse(input: &'static str) -> Result<Parsed> {
         Ok(all_consuming(Self::calibration)(input)?.1)
     }
 
-    #[inline]
     fn calibration(s: &'static str) -> IResult<Parsed> {
         separated_list1(newline, Self::calibration_equation)(s)
     }
 
-    #[inline]
     fn calibration_equation(s: &'static str) -> IResult<CalibrationEquation> {
         map(
             separated_pair(u64, tag(": "), Self::numbers),
@@ -105,7 +98,6 @@ impl Parser {
         )(s)
     }
 
-    #[inline]
     fn numbers(s: &'static str) -> IResult<Vec<u64>> {
         separated_list1(tag(" "), u64)(s)
     }

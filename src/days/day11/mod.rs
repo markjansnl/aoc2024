@@ -10,19 +10,17 @@ day! {
 }
 
 impl Day {
-    #[inline]
     fn part1(stones: Parsed) -> Result<Output> {
         Ok(stones.map(|stone| count_after_blinks(stone, 25)).sum())
     }
 
-    #[inline]
     fn part2(stones: Parsed) -> Result<Output> {
         Ok(stones.map(|stone| count_after_blinks(stone, 75)).sum())
     }
 }
 
 #[memoize]
-#[inline]
+
 fn count_after_blinks(stone: u64, blinks: u8) -> usize {
     if blinks == 0 {
         1
@@ -46,7 +44,6 @@ struct StoneIter {
 }
 
 impl From<&'static str> for StoneIter {
-    #[inline]
     fn from(value: &'static str) -> Self {
         Self {
             bytes: Some(value.bytes()),
@@ -58,7 +55,6 @@ impl From<&'static str> for StoneIter {
 impl Iterator for StoneIter {
     type Item = u64;
 
-    #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(bytes) = &mut self.bytes {
             #[allow(clippy::while_let_on_iterator)]
@@ -79,7 +75,6 @@ impl Iterator for StoneIter {
 }
 
 impl Parser {
-    #[inline]
     fn parse(input: &'static str) -> Result<Parsed> {
         Ok(StoneIter::from(input))
     }
