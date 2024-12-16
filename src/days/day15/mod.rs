@@ -174,10 +174,8 @@ impl Map {
         let next_box_left = current_box_left.next(direction);
         let next_box_right = current_box_right.next(direction);
 
-        if (direction == Direction::Right
-            || self.check_move_part2(next_box_left, direction, visited, changes))
-            && (direction == Direction::Left
-                || self.check_move_part2(next_box_right, direction, visited, changes))
+        if self.check_move_part2(next_box_left, direction, visited, changes)
+            && self.check_move_part2(next_box_right, direction, visited, changes)
         {
             changes.push((current_box_left, Tile::Empty));
             changes.push((current_box_right, Tile::Empty));
