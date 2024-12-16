@@ -74,24 +74,8 @@ impl Map {
     }
 
     fn successors(&self, node: &Node) -> Vec<(Node, usize)> {
-        let mut successors = vec![
-            (
-                Node {
-                    position: node.position,
-                    direction: node.direction.rotate_cw(),
-                },
-                1000,
-            ),
-            (
-                Node {
-                    position: node.position,
-                    direction: node.direction.rotate_ccw(),
-                },
-                1000,
-            ),
-        ];
-
-        let next_position = node.position.next(node.direction);
+        let mut successors = Vec::with_capacity(3);
+        let mut next_position = node.position.next(node.direction);
         if self.tiles[next_position.y][next_position.x] != Tile::Wall {
             successors.push((
                 Node {
@@ -99,6 +83,30 @@ impl Map {
                     direction: node.direction,
                 },
                 1,
+            ));
+        }
+
+        let mut next_direction = node.direction.rotate_cw();
+        next_position = node.position.next(next_direction);
+        if self.tiles[next_position.y][next_position.x] != Tile::Wall {
+            successors.push((
+                Node {
+                    position: node.position,
+                    direction: next_direction,
+                },
+                1000,
+            ));
+        }
+
+        next_direction = node.direction.rotate_ccw();
+        next_position = node.position.next(next_direction);
+        if self.tiles[next_position.y][next_position.x] != Tile::Wall {
+            successors.push((
+                Node {
+                    position: node.position,
+                    direction: next_direction,
+                },
+                1000,
             ));
         }
 
