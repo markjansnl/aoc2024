@@ -61,7 +61,7 @@ impl From<Vec<Vec<Tile>>> for Map {
 }
 
 impl Map {
-    fn find(tiles: &Vec<Vec<Tile>>, tile: Tile) -> Position {
+    fn find(tiles: &[Vec<Tile>], tile: Tile) -> Position {
         tiles
             .iter()
             .enumerate()
