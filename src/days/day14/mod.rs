@@ -13,6 +13,7 @@ use crate::*;
 day! {
     Output = i32,
     Parsed = Robots,
+    bench_sample_size: 80,
 }
 
 struct Robots {
@@ -53,9 +54,9 @@ impl Day {
     }
 
     fn part2(robots: Parsed) -> Result<Output> {
-        Ok((1..6_500)
+        Ok((1..10_000)
             .map(|i| (i, Self::safety_factor(&robots, i)))
-            .min_by(|(_, a), (_, b)| a.cmp(b))
+            .min_by_key(|(_, safety_factor)| *safety_factor)
             .unwrap()
             .0)
     }
