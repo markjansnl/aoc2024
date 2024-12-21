@@ -5,6 +5,7 @@ use crate::*;
 day! {
     Output = usize,
     Parsed = Input,
+    bench_sample_size: 10,
 }
 
 #[derive(Default)]
