@@ -1,3 +1,5 @@
+use std::collections::BTreeSet;
+
 use nom::{
     branch::alt,
     bytes::complete::tag,
@@ -12,10 +14,12 @@ use crate::*;
 day! {
     Output = String,
     Parsed = Device,
+    bench_sample_size: 50,
 }
 
 type Number = usize;
 
+#[derive(Clone)]
 struct Device {
     registers: [Number; 3],
     program: Vec<Number>,
@@ -89,8 +93,25 @@ impl Day {
             .join(","))
     }
 
-    fn part2(_parsed: Parsed) -> Result<Output> {
-        Ok("".to_string())
+    fn part2(device: Parsed) -> Result<Output> {
+        let mut prev = BTreeSet::from([0]);
+        let mut next = BTreeSet::new();
+        for i in 0..16 {
+            for prefix in &prev {
+                for j in 0..8usize {
+                    let mut d = device.clone();
+                    let register_a = (prefix << 3) + j;
+                    d.registers[0] = register_a;
+                    let output = d.run();
+                    if output.len() == i + 1 && device.program.ends_with(&output) {
+                        next.insert(register_a);
+                    }
+                }
+            }
+            prev.append(&mut next);
+        }
+
+        Ok(prev.first().unwrap().to_string())
     }
 }
 
@@ -147,18 +168,7 @@ mod tests {
 
     run!(Part2);
 
-    // #[test]
-    // fn operation1() {
-    //     let mut device = Device {
-    //         registers: [0, 0, 9],
-    //         program: vec![2, 6],
-    //         ip: 0,
-    //     };
-    //     device.run();
-    //     assert_eq!(device.registers[1], 1);
-    // }
-
     test_example!("example1", Part1, "4,6,3,5,6,3,5,2,1,0");
 
-    test_example!("example2", Part1, 0);
+    test_example!("example2", Part2, 117440);
 }
