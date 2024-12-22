@@ -96,7 +96,7 @@ impl Day {
     fn part2(device: Parsed) -> Result<Output> {
         let mut prev = BTreeSet::from([0]);
         let mut next = BTreeSet::new();
-        for i in 0..16 {
+        for i in 0..device.program.len() {
             for prefix in &prev {
                 for j in 0..8usize {
                     let mut d = device.clone();
@@ -108,6 +108,7 @@ impl Day {
                     }
                 }
             }
+            prev.clear();
             prev.append(&mut next);
         }
 
