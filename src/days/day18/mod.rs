@@ -92,6 +92,7 @@ impl Day {
 
         let mut last_path = Vec::new();
 
+        #[allow(clippy::while_let_on_iterator)]
         while let Some(position) = coordinates_iter.next() {
             memory_space.bytes[position] = Tile::Corrupted;
 

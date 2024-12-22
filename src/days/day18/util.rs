@@ -48,7 +48,7 @@ impl From<(usize, usize)> for Position {
     }
 }
 
-impl<'a, const WIDTH: usize, const HEIGHT: usize, T> Default for Grid<WIDTH, HEIGHT, T>
+impl<const WIDTH: usize, const HEIGHT: usize, T> Default for Grid<WIDTH, HEIGHT, T>
 where
     T: Default + Copy,
 {
@@ -73,16 +73,16 @@ where
         }
     }
 
-    pub fn rows<'a>(&'a self) -> impl Iterator<Item = GridSlice<'a, WIDTH, HEIGHT, T>> {
-        (0..self.height).map(move |y| GridSlice::<'a, WIDTH, HEIGHT, T> {
+    pub fn rows(&self) -> impl Iterator<Item = GridSlice<WIDTH, HEIGHT, T>> {
+        (0..self.height).map(move |y| GridSlice::<WIDTH, HEIGHT, T> {
             grid: self,
             axis: Axis::Horizontal,
             index: y,
         })
     }
 
-    pub fn columns<'a>(&'a self) -> impl Iterator<Item = GridSlice<'a, WIDTH, HEIGHT, T>> {
-        (0..self.width).map(move |x| GridSlice::<'a, WIDTH, HEIGHT, T> {
+    pub fn columns(&self) -> impl Iterator<Item = GridSlice<WIDTH, HEIGHT, T>> {
+        (0..self.width).map(move |x| GridSlice::<WIDTH, HEIGHT, T> {
             grid: self,
             axis: Axis::Vertical,
             index: x,
@@ -107,7 +107,7 @@ where
         self.width * self.height
     }
 
-    pub fn position<'a>(&'a self, position: Position) -> GridPosition<'a, WIDTH, HEIGHT, T> {
+    pub fn position(&self, position: Position) -> GridPosition<WIDTH, HEIGHT, T> {
         GridPosition {
             grid: self,
             position,
@@ -119,7 +119,8 @@ where
     }
 }
 
-impl<'a, const WIDTH: usize, const HEIGHT: usize, T> FromIterator<(Position, T)> for Grid<WIDTH, HEIGHT, T>
+impl<const WIDTH: usize, const HEIGHT: usize, T> FromIterator<(Position, T)>
+    for Grid<WIDTH, HEIGHT, T>
 where
     T: Default + Copy,
 {
@@ -132,7 +133,7 @@ where
     }
 }
 
-impl<'a, const WIDTH: usize, const HEIGHT: usize, T> Index<Position> for Grid<WIDTH, HEIGHT, T>
+impl<const WIDTH: usize, const HEIGHT: usize, T> Index<Position> for Grid<WIDTH, HEIGHT, T>
 where
     T: Default + Copy,
 {
@@ -143,7 +144,8 @@ where
     }
 }
 
-impl<'a, const WIDTH: usize, const HEIGHT: usize, T> Index<GridPosition<'a, WIDTH, HEIGHT, T>> for Grid<WIDTH, HEIGHT, T>
+impl<'a, const WIDTH: usize, const HEIGHT: usize, T> Index<GridPosition<'a, WIDTH, HEIGHT, T>>
+    for Grid<WIDTH, HEIGHT, T>
 where
     T: Default + Copy,
 {
@@ -154,7 +156,7 @@ where
     }
 }
 
-impl<'a, const WIDTH: usize, const HEIGHT: usize, T> IndexMut<Position> for Grid<WIDTH, HEIGHT, T>
+impl<const WIDTH: usize, const HEIGHT: usize, T> IndexMut<Position> for Grid<WIDTH, HEIGHT, T>
 where
     T: Default + Copy,
 {
@@ -163,17 +165,21 @@ where
     }
 }
 
-impl<'a, const WIDTH: usize, const HEIGHT: usize, T> IndexMut<GridPosition<'a, WIDTH, HEIGHT, T>> for Grid<WIDTH, HEIGHT, T>
+impl<'a, const WIDTH: usize, const HEIGHT: usize, T> IndexMut<GridPosition<'a, WIDTH, HEIGHT, T>>
+    for Grid<WIDTH, HEIGHT, T>
 where
     T: Default + Copy,
 {
-    fn index_mut(&mut self, grid_position: GridPosition<'a, WIDTH, HEIGHT, T>) -> &mut Self::Output {
+    fn index_mut(
+        &mut self,
+        grid_position: GridPosition<'a, WIDTH, HEIGHT, T>,
+    ) -> &mut Self::Output {
         &mut self[grid_position.position]
     }
 }
 
-impl<'a, const WIDTH: usize, const HEIGHT: usize, T> Index<usize>
-    for GridSlice<'a, WIDTH, HEIGHT, T>
+impl<const WIDTH: usize, const HEIGHT: usize, T> Index<usize>
+    for GridSlice<'_, WIDTH, HEIGHT, T>
 where
     T: Default + Copy,
 {
@@ -197,7 +203,7 @@ where
     }
 }
 
-impl<'a, const WIDTH: usize, const HEIGHT: usize, T> GridSlice<'a, WIDTH, HEIGHT, T>
+impl<const WIDTH: usize, const HEIGHT: usize, T> GridSlice<'_, WIDTH, HEIGHT, T>
 where
     T: Default + Copy,
 {
@@ -267,7 +273,7 @@ impl Position {
     }
 }
 
-impl<'a, const WIDTH: usize, const HEIGHT: usize, T> GridPosition<'a, WIDTH, HEIGHT, T>
+impl<const WIDTH: usize, const HEIGHT: usize, T> GridPosition<'_, WIDTH, HEIGHT, T>
 where
     T: Default + Copy,
 {
