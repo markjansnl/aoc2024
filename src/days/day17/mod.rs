@@ -73,7 +73,7 @@ impl Device {
     fn combo(&self, operand: Number) -> Number {
         match operand {
             0..=3 => operand,
-            4..=6 => self.registers[operand as usize - 4],
+            4..=6 => self.registers[operand - 4],
             _ => unreachable!(),
         }
     }
