@@ -178,8 +178,7 @@ where
     }
 }
 
-impl<const WIDTH: usize, const HEIGHT: usize, T> Index<usize>
-    for GridSlice<'_, WIDTH, HEIGHT, T>
+impl<const WIDTH: usize, const HEIGHT: usize, T> Index<usize> for GridSlice<'_, WIDTH, HEIGHT, T>
 where
     T: Default + Copy,
 {
