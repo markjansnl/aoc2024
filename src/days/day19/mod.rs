@@ -1,29 +1,67 @@
-use nom::{character::complete::u32, combinator::all_consuming};
+use memoize::memoize;
 
 use crate::*;
 
 day! {
-    Output = u32,
-    Parsed = u32,
+    Output = usize,
+    Parsed = Input,
+}
+
+struct Input {
+    patterns: Vec<&'static str>,
+    designs: Vec<&'static str>,
 }
 
 impl Day {
     fn part1(parsed: Parsed) -> Result<Output> {
-        Ok(parsed)
+        Ok(parsed
+            .designs
+            .into_iter()
+            .filter(|design| is_possible(design, parsed.patterns.clone()))
+            .count())
     }
 
-    fn part2(_parsed: Parsed) -> Result<Output> {
-        Ok(0)
+    fn part2(parsed: Parsed) -> Result<Output> {
+        Ok(parsed
+            .designs
+            .into_iter()
+            .map(|design| arrangements(design, parsed.patterns.clone()))
+            .sum())
     }
+}
+
+#[memoize]
+fn is_possible(design: &'static str, patterns: Vec<&'static str>) -> bool {
+    patterns.iter().any(|pattern| {
+        design == *pattern
+            || (design.starts_with(pattern)
+                && is_possible(&design[pattern.len()..], patterns.clone()))
+    })
+}
+
+#[memoize]
+fn arrangements(design: &'static str, patterns: Vec<&'static str>) -> usize {
+    patterns
+        .iter()
+        .map(|pattern| {
+            if design == *pattern {
+                1
+            } else if let Some(tail) = design.strip_prefix(pattern) {
+                arrangements(tail, patterns.clone())
+            } else {
+                0
+            }
+        })
+        .sum()
 }
 
 impl Parser {
     fn parse(input: &'static str) -> Result<Parsed> {
-        Ok(all_consuming(Self::integer)(input)?.1)
-    }
-
-    fn integer(s: &'static str) -> IResult<Parsed> {
-        u32(s)
+        let (patterns, designs) = input.split_once("\n\n").unwrap();
+        Ok(Input {
+            patterns: patterns.split(", ").collect(),
+            designs: designs.lines().collect(),
+        })
     }
 }
 
@@ -35,7 +73,7 @@ mod tests {
 
     run!(Part2);
 
-    test_example!("example1", Part1, 0);
+    test_example!("example1", Part1, 6);
 
-    test_example!("example1", Part2, 0);
+    test_example!("example1", Part2, 16);
 }
