@@ -1,3 +1,6 @@
+#![feature(portable_simd)]
+#![allow(elided_named_lifetimes)]
+
 mod days;
 
 use std::fmt::{self, Debug};
