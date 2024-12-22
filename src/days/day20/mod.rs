@@ -113,8 +113,10 @@ impl Day {
 
 impl Parser {
     fn parse(input: &'static str) -> Result<Parsed> {
-        let mut parsed = Input::default();
-        parsed.is_example = input.lines().count() == 15;
+        let mut parsed = Input {
+            is_example: input.lines().count() == 15,
+            ..Default::default()
+        };
         for (y, line) in input.lines().enumerate() {
             for (x, b) in line.bytes().enumerate() {
                 match b {
