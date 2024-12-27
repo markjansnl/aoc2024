@@ -1,7 +1,7 @@
 use crate::*;
 
 day! {
-    Output = usize,
+    Output = String,
     Parsed = Vec<Schematic>,
 }
 
@@ -49,11 +49,11 @@ impl Day {
                 }
             }
         }
-        Ok(count)
+        Ok(count.to_string())
     }
 
     fn part2(_parsed: Parsed) -> Result<Output> {
-        Ok(0)
+        Ok("Merry Christmas!".to_string())
     }
 }
 
